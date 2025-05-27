@@ -1,45 +1,34 @@
 #!/bin/bash
 
-sudo -i
+sudo apt update -y
+sudo apt upgrade -y
 
-# Update system packages
-yum update -y
+sudo apt install -y apache2
+sudo systemctl enable apache2
+sudo systemctl start apache2
 
-# Install Apache (httpd)
-yum install -y httpd
-systemctl enable httpd
-systemctl start httpd
+sudo apt install -y php php-mysql php-gd
 
-# Install PHP and common modules
-yum install -y php php-mysqlnd php-gd
+sudo apt install -y mariadb-server
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
 
-# Install MariaDB
-yum install -y mariadb-server
-systemctl start mariadb
-systemctl enable mariadb
-
-# Create PHP info page (for testing PHP functionality)
-cat <<EOF > /var/www/html/info.php
+cat <<EOF | sudo tee /var/www/html/info.php
 <?php
 phpinfo();
 ?>
 EOF
 
-# Restart Apache to apply PHP integration
-systemctl restart httpd
+sudo systemctl restart apache2
 
-# Install wget (if not already available)
-yum install -y wget
+sudo apt install -y wget
 
-# Download and extract WordPress
 cd /tmp
 wget https://wordpress.org/latest.tar.gz
-tar -xzvf latest.tar.gz -C /var/www/html/
+sudo tar -xzvf latest.tar.gz -C /var/www/html/
 rm -f latest.tar.gz
 
-# Copy sample WordPress config
-cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+sudo cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
-# Optional: Fix permissions (recommended for real deployments)
-chown -R apache:apache /var/www/html/wordpress
-chmod -R 755 /var/www/html/wordpress
+sudo chown -R www-data:www-data /var/www/html/wordpress
+sudo chmod -R 755 /var/www/html/wordpress
